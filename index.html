@@ -2,65 +2,90 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ahad Account | Secure Matrix System</title>
+<title>Ahad Account | Matrix System</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
+*{margin:0;padding:0;box-sizing:border-box}
 body{
   background:black;
   color:#00ff00;
   font-family:monospace;
   overflow:hidden;
 }
+canvas{position:fixed;top:0;left:0;z-index:0}
 
-/* MATRIX CANVAS */
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:0;
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  background:black;
+  border:1px solid #00ff00;
+  color:#00ff00;
+  font-family:monospace;
+}
+button{
+  background:#00ff00;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{background:#00cc00}
+
+/* LOGIN */
+#loginScreen{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  z-index:5;background:black;
+}
+.loginBox{
+  border:1px solid #00ff00;
+  padding:30px;width:300px;text-align:center;
+  box-shadow:0 0 20px #00ff00;
 }
 
-/* MAIN UI */
+/* MAIN */
 .container{
-  position:relative;
-  z-index:2;
-  text-align:center;
-  margin-top:60px;
+  position:relative;z-index:2;
+  text-align:center;margin-top:40px;
+  display:none;
 }
-
-h1{
-  font-size:3rem;
-  text-shadow:0 0 20px #00ff00;
-}
-
-.notice{
-  color:red;
-  margin:15px 0 30px;
-  font-size:14px;
-}
+h1{text-shadow:0 0 20px #00ff00;font-size:3rem}
+.notice{color:red;margin:10px 0}
 
 .card{
   border:1px solid #00ff00;
-  width:320px;
-  margin:15px auto;
-  padding:20px;
+  width:340px;margin:12px auto;padding:20px;
   box-shadow:0 0 20px #00ff00;
   background:rgba(0,0,0,0.6);
 }
+.money{font-size:1.8rem}
 
-.card h2{
-  margin-bottom:10px;
+/* OVERLAYS */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.95);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:6;
 }
+.overlay h2{
+  font-size:2.5rem;
+  text-shadow:0 0 20px #00ff00;
+}
+.check{font-size:5rem;margin-bottom:20px}
 
-.money{
-  font-size:1.8rem;
-  letter-spacing:2px;
+/* HISTORY */
+.history{
+  max-height:150px;
+  overflow:auto;
+  font-size:14px;
+  text-align:left;
+}
+.history div{
+  border-bottom:1px dashed #00ff00;
+  padding:5px 0;
 }
 </style>
 </head>
@@ -69,7 +94,18 @@ h1{
 
 <canvas id="matrix"></canvas>
 
-<div class="container">
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="loginBox">
+    <h2>Secure Login</h2>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">LOGIN</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container" id="main">
   <h1>Ahad Account</h1>
   <p class="notice">⚠ PRANK WEBSITE — NO REAL MONEY ⚠</p>
 
@@ -87,63 +123,95 @@ h1{
     <h2>HBL Bank</h2>
     <div class="money" id="hbl">0</div>
   </div>
+
+  <div class="card">
+    <h2>Send Payment</h2>
+    <input id="account" placeholder="Account Number">
+    <button onclick="openOTP()">SEND</button>
+  </div>
+
+  <div class="card">
+    <h2>Transaction History</h2>
+    <div class="history" id="history"></div>
+  </div>
+</div>
+
+<!-- OTP -->
+<div class="overlay" id="otpScreen">
+  <h2>Enter OTP</h2>
+  <p>(Demo OTP: 123456)</p>
+  <input id="otp" placeholder="OTP Code">
+  <button onclick="verifyOTP()">VERIFY</button>
+</div>
+
+<!-- SENT -->
+<div class="overlay" id="sentScreen">
+  <div class="check">✔</div>
+  <h2>PAYMENT SENT</h2>
 </div>
 
 <script>
-// FAKE MONEY COUNTER (PRANK)
-let easy = 0, jazz = 0, hbl = 0;
-
-setInterval(() => {
-  easy += 1000;
-  jazz += 1000;
-  hbl += 1000;
-
-  document.getElementById("easy").innerText = easy.toLocaleString();
-  document.getElementById("jazz").innerText = jazz.toLocaleString();
-  document.getElementById("hbl").innerText = hbl.toLocaleString();
-}, 1000);
-
-// MATRIX BACKGROUND EFFECT
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const letters = "01";
-const fontSize = 16;
-const columns = canvas.width / fontSize;
-const drops = [];
-
-for(let i=0;i<columns;i++){
-  drops[i] = 1;
+// LOGIN
+function login(){
+  if(user.value==="ahad" && pass.value==="a2z12345"){
+    loginScreen.style.display="none";
+    main.style.display="block";
+  }else alert("Access Denied");
 }
 
-function drawMatrix(){
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
+// FAKE BALANCES
+let easy=0,jazz=0,hbl=0;
+setInterval(()=>{
+  easy+=1000;jazz+=1000;hbl+=1000;
+  easyEl.innerText=easy.toLocaleString();
+  jazzEl.innerText=jazz.toLocaleString();
+  hblEl.innerText=hbl.toLocaleString();
+},1000);
+
+const easyEl=easy, jazzEl=jazz, hblEl=hbl;
+
+// PAYMENT FLOW
+function openOTP(){
+  if(account.value===""){alert("Enter account number");return;}
+  otpScreen.style.display="flex";
+}
+
+function verifyOTP(){
+  if(otp.value!=="123456"){alert("Invalid OTP");return;}
+  otpScreen.style.display="none";
+  sentScreen.style.display="flex";
+
+  const log=`${new Date().toLocaleTimeString()} → Sent to ${account.value}`;
+  const div=document.createElement("div");
+  div.innerText=log;
+  history.prepend(div);
+
+  setTimeout(()=>{
+    sentScreen.style.display="none";
+    account.value=""; otp.value="";
+  },3000);
+}
+
+// MATRIX EFFECT
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth; canvas.height=innerHeight;
+const letters="01", fontSize=16;
+const columns=canvas.width/fontSize;
+const drops=Array.from({length:columns}).fill(1);
+
+function draw(){
+  ctx.fillStyle="rgba(0,0,0,0.05)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  ctx.fillStyle = "#00ff00";
-  ctx.font = fontSize + "px monospace";
-
-  for(let i=0;i<drops.length;i++){
-    const text = letters[Math.floor(Math.random()*letters.length)];
-    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-
-    if(drops[i]*fontSize > canvas.height && Math.random()>0.975){
-      drops[i]=0;
-    }
+  ctx.fillStyle="#00ff00";
+  ctx.font=fontSize+"px monospace";
+  drops.forEach((y,i)=>{
+    ctx.fillText(letters[Math.random()>0.5?1:0],i*fontSize,y*fontSize);
+    if(y*fontSize>canvas.height && Math.random()>0.975)drops[i]=0;
     drops[i]++;
-  }
+  });
 }
-
-setInterval(drawMatrix,50);
-
-// RESIZE FIX
-window.onresize = () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-};
+setInterval(draw,50);
 </script>
 
 </body>
