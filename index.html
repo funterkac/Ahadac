@@ -1,0 +1,74 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Terminal, Calculator } from "lucide-react";
+
+export default function AhadAccountSoftware() {
+  const [result, setResult] = useState("Awaiting input...");
+
+  const runVlookup = () => {
+    setResult("VLOOKUP executed: Account matched successfully ✔");
+  };
+
+  const runHlookup = () => {
+    setResult("HLOOKUP executed: Ledger row identified ✔");
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-green-400 font-mono overflow-hidden">
+      {/* Matrix Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#00ff8844,_transparent_60%)] animate-pulse" />
+
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 text-center py-10"
+      >
+        <h1 className="text-4xl md:text-6xl font-bold tracking-widest">AHAD ACCOUNT SOFTWARE</h1>
+        <p className="mt-4 text-green-300">Matrix‑style smart accounting & data lookup system</p>
+      </motion.header>
+
+      <main className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 px-6 pb-20">
+        <Card className="bg-black/70 border border-green-500 shadow-green-500/30 shadow-xl rounded-2xl">
+          <CardContent className="p-6">
+            <Terminal className="mb-3" />
+            <h2 className="text-xl mb-2">VLOOKUP</h2>
+            <p className="text-sm text-green-300 mb-4">Find accounts, balances, invoices instantly.</p>
+            <Button onClick={runVlookup} className="w-full">Run VLOOKUP</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-black/70 border border-green-500 shadow-green-500/30 shadow-xl rounded-2xl">
+          <CardContent className="p-6">
+            <Calculator className="mb-3" />
+            <h2 className="text-xl mb-2">HLOOKUP</h2>
+            <p className="text-sm text-green-300 mb-4">Search ledgers, monthly reports, summaries.</p>
+            <Button onClick={runHlookup} className="w-full">Run HLOOKUP</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-black/70 border border-green-500 shadow-green-500/30 shadow-xl rounded-2xl">
+          <CardContent className="p-6">
+            <h2 className="text-xl mb-2">More Tools</h2>
+            <ul className="text-sm text-green-300 space-y-2">
+              <li>✔ IF / IFERROR logic</li>
+              <li>✔ SUMIF & COUNTIF</li>
+              <li>✔ Automated Profit & Loss</li>
+              <li>✔ Secure Account Database</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </main>
+
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="relative z-10 text-center text-xs text-green-500 pb-6"
+      >
+        © 2026 Ahad Account Software • Hack the Numbers, Not the System
+      </motion.footer>
+    </div>
+  );
+}
