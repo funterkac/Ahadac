@@ -14,55 +14,84 @@ body{
 }
 canvas{position:fixed;top:0;left:0;z-index:0}
 
-input,button{
+/* LOGIN */
+#loginScreen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:black;
+  z-index:5;
+}
+
+.loginBox{
+  border:1px solid #00ff00;
+  padding:30px;
+  width:300px;
+  text-align:center;
+  box-shadow:0 0 20px #00ff00;
+}
+
+.loginBox h2{margin-bottom:20px}
+
+input{
   width:100%;
   padding:10px;
-  margin-top:10px;
+  margin:8px 0;
   background:black;
   border:1px solid #00ff00;
   color:#00ff00;
-  font-family:monospace;
+  outline:none;
 }
+
 button{
+  margin-top:15px;
+  padding:10px;
+  width:100%;
   background:#00ff00;
   color:black;
+  border:none;
   font-weight:bold;
   cursor:pointer;
 }
 button:hover{background:#00cc00}
 
-/* LOGIN */
-#loginScreen{
-  position:fixed;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  z-index:5;background:black;
-}
-.loginBox{
-  border:1px solid #00ff00;
-  padding:30px;width:300px;text-align:center;
-  box-shadow:0 0 20px #00ff00;
-}
-
 /* MAIN */
 .container{
-  position:relative;z-index:2;
-  text-align:center;margin-top:40px;
+  position:relative;
+  z-index:2;
+  text-align:center;
+  margin-top:40px;
   display:none;
 }
-h1{text-shadow:0 0 20px #00ff00;font-size:3rem}
-.notice{color:red;margin:10px 0}
+
+h1{
+  font-size:3rem;
+  text-shadow:0 0 20px #00ff00;
+}
+
+.notice{
+  color:red;
+  margin:10px 0 20px;
+  font-size:14px;
+}
 
 .card{
   border:1px solid #00ff00;
-  width:340px;margin:12px auto;padding:20px;
+  width:340px;
+  margin:12px auto;
+  padding:20px;
   box-shadow:0 0 20px #00ff00;
   background:rgba(0,0,0,0.6);
 }
-.money{font-size:1.8rem}
 
-/* OVERLAYS */
-.overlay{
-  position:fixed;inset:0;
+.money{font-size:1.8rem;margin-top:10px}
+
+/* PAYMENT SENT */
+#sentScreen{
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,0.95);
   display:none;
   align-items:center;
@@ -70,23 +99,13 @@ h1{text-shadow:0 0 20px #00ff00;font-size:3rem}
   flex-direction:column;
   z-index:6;
 }
-.overlay h2{
-  font-size:2.5rem;
+
+#sentScreen h2{
+  font-size:3rem;
   text-shadow:0 0 20px #00ff00;
 }
-.check{font-size:5rem;margin-bottom:20px}
 
-/* HISTORY */
-.history{
-  max-height:150px;
-  overflow:auto;
-  font-size:14px;
-  text-align:left;
-}
-.history div{
-  border-bottom:1px dashed #00ff00;
-  padding:5px 0;
-}
+.check{font-size:5rem;margin-bottom:20px}
 </style>
 </head>
 
@@ -94,109 +113,95 @@ h1{text-shadow:0 0 20px #00ff00;font-size:3rem}
 
 <canvas id="matrix"></canvas>
 
-<!-- LOGIN -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="loginBox">
     <h2>Secure Login</h2>
-    <input id="user" placeholder="Username">
-    <input id="pass" type="password" placeholder="Password">
+    <input type="text" id="user" placeholder="Username">
+    <input type="password" id="pass" placeholder="Password">
     <button onclick="login()">LOGIN</button>
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- MAIN DASHBOARD -->
 <div class="container" id="main">
   <h1>Ahad Account</h1>
-  <p class="notice">⚠ PRANK WEBSITE — NO REAL MONEY ⚠</p>
+  <p class="notice">⚠ AHAD ACCOUNT WEBSITE — MONEY HEIST ⚠</p>
 
   <div class="card">
     <h2>Easypaisa</h2>
-    <div class="money" id="easy">1570347000</div>
+    <div class="money" id="easy">0</div>
   </div>
 
   <div class="card">
     <h2>JazzCash</h2>
-    <div class="money" id="jazz">50347000</div>
+    <div class="money" id="jazz">0</div>
   </div>
 
   <div class="card">
     <h2>HBL Bank</h2>
-    <div class="money" id="hbl">8850367000</div>
+    <div class="money" id="hbl">0</div>
   </div>
 
   <div class="card">
     <h2>Send Payment</h2>
-    <input id="account" placeholder="Account Number">
-    <button onclick="openOTP()">SEND</button>
-  </div>
-
-  <div class="card">
-    <h2>Transaction History</h2>
-    <div class="history" id="history"></div>
+    <input type="text" id="account" placeholder="Enter Account Number">
+    <button onclick="sendPayment()">SEND PAYMENT</button>
   </div>
 </div>
 
-<!-- OTP -->
-<div class="overlay" id="otpScreen">
-  <h2>Enter OTP</h2>
-  <p>(Demo OTP: 123456)</p>
-  <input id="otp" placeholder="OTP Code">
-  <button onclick="verifyOTP()">VERIFY</button>
-</div>
-
-<!-- SENT -->
-<div class="overlay" id="sentScreen">
+<!-- PAYMENT SENT -->
+<div id="sentScreen">
   <div class="check">✔</div>
   <h2>PAYMENT SENT</h2>
 </div>
 
 <script>
-// LOGIN
+// LOGIN LOGIC (PRANK)
 function login(){
-  if(user.value==="ahad" && pass.value==="a2z12345"){
-    loginScreen.style.display="none";
-    main.style.display="block";
-  }else alert("Access Denied");
+  const u=document.getElementById("user").value;
+  const p=document.getElementById("pass").value;
+
+  if(u==="ahad" && p==="a2z12345"){
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("main").style.display="block";
+  }else{
+    alert("Access Denied");
+  }
 }
 
 // FAKE BALANCES
-let easy=0,jazz=0,hbl=0;
+let easy=54300,jazz=74312,hbl=5032165;
 setInterval(()=>{
-  easy+=1000;jazz+=1000;hbl+=1000;
+  easy+=1000; jazz+=1000; hbl+=1000;
   easyEl.innerText=easy.toLocaleString();
   jazzEl.innerText=jazz.toLocaleString();
   hblEl.innerText=hbl.toLocaleString();
 },1000);
 
-const easyEl=easy, jazzEl=jazz, hblEl=hbl;
+const easyEl=document.getElementById("easy");
+const jazzEl=document.getElementById("jazz");
+const hblEl=document.getElementById("hbl");
 
-// PAYMENT FLOW
-function openOTP(){
-  if(account.value===""){alert("Enter account number");return;}
-  otpScreen.style.display="flex";
-}
-
-function verifyOTP(){
-  if(otp.value!=="123456"){alert("Invalid OTP");return;}
-  otpScreen.style.display="none";
+// SEND PAYMENT
+function sendPayment(){
+  const acc=document.getElementById("account").value;
+  if(acc===""){alert("Enter Account Number");return;}
   sentScreen.style.display="flex";
-
-  const log=`${new Date().toLocaleTimeString()} → Sent to ${account.value}`;
-  const div=document.createElement("div");
-  div.innerText=log;
-  history.prepend(div);
-
   setTimeout(()=>{
     sentScreen.style.display="none";
-    account.value=""; otp.value="";
+    account.value="";
   },3000);
 }
 
 // MATRIX EFFECT
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
-canvas.width=innerWidth; canvas.height=innerHeight;
-const letters="01", fontSize=16;
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+const letters="01";
+const fontSize=16;
 const columns=canvas.width/fontSize;
 const drops=Array.from({length:columns}).fill(1);
 
@@ -212,6 +217,8 @@ function draw(){
   });
 }
 setInterval(draw,50);
+
+window.onresize=()=>{canvas.width=innerWidth;canvas.height=innerHeight};
 </script>
 
 </body>
